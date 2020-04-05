@@ -1,10 +1,12 @@
 class UserController < ApplicationController
 
   skip_before_action :verify_authenticity_token
-  before_action :authorize_request, except: [:singup, :login]
+  before_action :authorize_request, except: [:signup, :login]
+
   def signup
     @user = User.create(:name => params[:name], :email => params[:email], :password => params[:password])
     if @user.errors.empty?
+      @user.calendar = Calendar.create()
       render json: {'error': false, "msg": "success"}
     else 
       render json: {'error': true, 'msg': @user.errors}

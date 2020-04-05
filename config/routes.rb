@@ -4,4 +4,5 @@ Rails.application.routes.draw do
   post "/signup" => "user#signup"
   post "/login" => "user#login"
   post "/hehe" => "user#hehe"
+  post "/create-slot" => "calendar#create_slot"
 end
