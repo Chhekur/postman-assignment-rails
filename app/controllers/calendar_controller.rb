@@ -53,30 +53,45 @@ class CalendarController < ApplicationController
     end
   end
 
-  def get_slots
-    if !is_user_exists? params[:email]
-      render json: {"error": true, "msg": "user doesn't exists"}
-      return
+  def get_slots is_available = nil
+    begin
+      if !is_user_exists? params[:email]
+        render json: {"error": true, "msg": "user doesn't exists"}
+        return
+      end
+      calendar = @user.calendar.year.find_by(:name => params[:year])
+      if calendar.nil?
+        render json: {"error": true, "msg": "no available slots for this date"}
+        return
+      end
+      calendar = calendar.month.find_by(:name => params[:month])
+      if calendar.nil?
+        render json: {"error": true, "msg": "no available slots for this date"}
+        return
+      end
+      calendar = calendar.day.find_by(:name => params[:day])
+      if calendar.nil?
+        render json: {"error": true, "msg": "no available slots for this date"}
+        return
+      end
+      if is_available.nil?
+        slots = calendar.slot.all
+      else
+        slots = calendar.slot.where(:is_available => is_available)
+      end
+      render json: {"error": true, "data": slots}
+    rescue Exception => e
+      render json: {"error": true, "msg": e.to_s}
     end
-    calendar = @user.calendar.year.find_by(:name => params[:year])
-    if calendar.nil?
-      render json: {"error": true, "msg": "no available slots for this date"}
-      return
-    end
-    calendar = calendar.month.find_by(:name => params[:month])
-    if calendar.nil?
-      render json: {"error": true, "msg": "no available slots for this date"}
-      return
-    end
-    calendar = calendar.day.find_by(:name => params[:day])
-    if calendar.nil?
-      render json: {"error": true, "msg": "no available slots for this date"}
-      return
-    end
-    slots = calendar.slot.all
-    render json: {"error": true, "data": slots}
   end
 
+  def get_available_slots
+    get_slots(true)
+  end
+
+  def get_booked_slots
+    get_slots(false) 
+  end
 
   private
 
