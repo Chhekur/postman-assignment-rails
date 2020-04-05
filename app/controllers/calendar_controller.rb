@@ -53,6 +53,30 @@ class CalendarController < ApplicationController
     end
   end
 
+  def get_slots
+    if !is_user_exists? params[:email]
+      render json: {"error": true, "msg": "user doesn't exists"}
+      return
+    end
+    calendar = @user.calendar.year.find_by(:name => params[:year])
+    if calendar.nil?
+      render json: {"error": true, "msg": "no available slots for this date"}
+      return
+    end
+    calendar = calendar.month.find_by(:name => params[:month])
+    if calendar.nil?
+      render json: {"error": true, "msg": "no available slots for this date"}
+      return
+    end
+    calendar = calendar.day.find_by(:name => params[:day])
+    if calendar.nil?
+      render json: {"error": true, "msg": "no available slots for this date"}
+      return
+    end
+    slots = calendar.slot.all
+    render json: {"error": true, "data": slots}
+  end
+
 
   private
 
@@ -94,5 +118,5 @@ class CalendarController < ApplicationController
   def is_slot_available?
     return @calendar.is_available
   end
-  
+
 end
