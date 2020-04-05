@@ -3,4 +3,5 @@ Rails.application.routes.draw do
   get "/" => "application#hello"
   post "/signup" => "user#signup"
   post "/login" => "user#login"
+  post "/hehe" => "user#hehe"
 end

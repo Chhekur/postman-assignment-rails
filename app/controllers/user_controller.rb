@@ -1,5 +1,7 @@
 class UserController < ApplicationController
+
   skip_before_action :verify_authenticity_token
+  before_action :authorize_request, except: [:singup, :login]
   def signup
     @user = User.create(:name => params[:name], :email => params[:email], :password => params[:password])
     if @user.errors.empty?
@@ -15,10 +17,16 @@ class UserController < ApplicationController
       render json: {"error": true, "msg": "invalid details"}
     else
       if @user.authenticate(params[:password])
-        render json: {"error": false, "msg": "success"}
+        token = JsonWebToken.encode(user_id: @user.id)
+        time = Time.now + 24.hours.to_i
+        render json: {"error": false, "msg": "success", "token": token, "exp": time.strftime("%m-%d-%Y %H:%M")}
       else
         render json: {"error": true, "msg": "invalid details"}
       end
     end
+  end
+
+  def hehe
+    render json: @current_user
   end
 end
