@@ -27,8 +27,4 @@ class UserController < ApplicationController
       end
     end
   end
-
-  def hehe
-    render json: @current_user
-  end
 end
