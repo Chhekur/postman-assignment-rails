@@ -14,6 +14,10 @@ class UserController < ApplicationController
   end
 
   def login
+    if params[:email].nil? or params[:password].nil?
+      render json: {"error": true, "msg": "missing parameters"}, status: 400
+      return
+    end
     @user = User.find_by(:email => params[:email])
     if @user.nil?
       render json: {"error": true, "msg": "invalid details"}, status: 400

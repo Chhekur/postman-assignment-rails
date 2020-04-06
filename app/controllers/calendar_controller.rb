@@ -1,9 +1,11 @@
 class CalendarController < ApplicationController
+  include CalendarHelper
 
   skip_before_action :verify_authenticity_token
-  before_action :authorize_request, except: [:singup, :login]
+  before_action :authorize_request
 
   def create_slot
+    return if !validate_params_for_create_slot? params
     begin
       calendar = @current_user.calendar
       if calendar.year.find_by(:name => params[:year]).nil?
@@ -31,6 +33,7 @@ class CalendarController < ApplicationController
 end
 
   def book_slot
+    return if !validate_params_for_book_slot? params
     begin
       if is_user_exists? params[:email]
         if is_slot_exists?
@@ -54,6 +57,7 @@ end
   end
 
   def get_slots is_available = nil
+    return if !validate_params_for_get_slot? params
     begin
       if !is_user_exists? params[:email]
         render json: {"error": true, "msg": "user doesn't exists"}, status: 400
@@ -86,10 +90,12 @@ end
   end
 
   def get_available_slots
+    return if !validate_params_for_get_slot? params
     get_slots(true)
   end
 
   def get_booked_slots
+    return if !validate_params_for_get_slot? params
     get_slots(false) 
   end
 
