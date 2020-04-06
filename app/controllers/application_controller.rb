@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   def hello
-    render json: {"error": false, "msg": "Hi"}
+    render json: {"error": false, "msg": "Hi"}, status: 200
   end
 
   def authorize_request

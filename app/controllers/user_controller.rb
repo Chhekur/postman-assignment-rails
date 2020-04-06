@@ -7,23 +7,23 @@ class UserController < ApplicationController
     @user = User.create(:name => params[:name], :email => params[:email], :password => params[:password])
     if @user.errors.empty?
       @user.calendar = Calendar.create()
-      render json: {'error': false, "msg": "success"}
+      render json: {'error': false, "msg": "success"}, status: 200
     else 
-      render json: {'error': true, 'msg': @user.errors}
+      render json: {'error': true, 'msg': @user.errors}, status: 400
     end
   end
 
   def login
     @user = User.find_by(:email => params[:email])
     if @user.nil?
-      render json: {"error": true, "msg": "invalid details"}
+      render json: {"error": true, "msg": "invalid details"}, status: 400
     else
       if @user.authenticate(params[:password])
         token = JsonWebToken.encode(user_id: @user.id)
         time = Time.now + 24.hours.to_i
-        render json: {"error": false, "msg": "success", "token": token, "exp": time.strftime("%m-%d-%Y %H:%M")}
+        render json: {"error": false, "msg": "success", "token": token, "exp": time.strftime("%m-%d-%Y %H:%M")}, status: 200
       else
-        render json: {"error": true, "msg": "invalid details"}
+        render json: {"error": true, "msg": "invalid details"}, status: 400
       end
     end
   end

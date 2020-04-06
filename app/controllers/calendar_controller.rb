@@ -21,12 +21,12 @@ class CalendarController < ApplicationController
       if calendar.slot.find_by(:start_time => params[:start_time], :end_time => params[:end_time]).nil?
         calendar.slot.create(:start_time => params[:start_time], :end_time => params[:end_time], :is_available => true)
       else
-        render json: {"error": true, "msg": "slot is alredy there"}
+        render json: {"error": true, "msg": "slot is alredy there"}, status: 400
         return
       end
-      render json: {"error": false, "msg": "slot created"}
+      render json: {"error": false, "msg": "slot created"}, status: 200
     rescue Exception => e
-      render json: {"error": true, "msg": e.to_s}
+      render json: {"error": true, "msg": e.to_s}, status: 400
     end
 end
 
@@ -38,40 +38,40 @@ end
             @calendar.is_available = false
             @calendar.user = @user.id
             @calendar.save!
-            render json: {"error": false, "msg": "slot booked"}
+            render json: {"error": false, "msg": "slot booked"}, status: 200
           else
-            render json: {"error": true, "msg": "slot is already booked"}  
+            render json: {"error": true, "msg": "slot is already booked"}, status: 400
           end
         else
-          render json: {"error": true, "msg": "slot doesn't exists"}
+          render json: {"error": true, "msg": "slot doesn't exists"}, status: 400
         end
       else
-        render json: {"error": true, "msg": "user doesn't exists"}
+        render json: {"error": true, "msg": "user doesn't exists"}, status: 400
       end
     rescue Exception => e
-      render json: {"error": true, "msg": e.to_s}
+      render json: {"error": true, "msg": e.to_s}, status: 400
     end
   end
 
   def get_slots is_available = nil
     begin
       if !is_user_exists? params[:email]
-        render json: {"error": true, "msg": "user doesn't exists"}
+        render json: {"error": true, "msg": "user doesn't exists"}, status: 400
         return
       end
       calendar = @user.calendar.year.find_by(:name => params[:year])
       if calendar.nil?
-        render json: {"error": true, "msg": "no available slots for this date"}
+        render json: {"error": true, "msg": "no available slots for this date"}, status: 400
         return
       end
       calendar = calendar.month.find_by(:name => params[:month])
       if calendar.nil?
-        render json: {"error": true, "msg": "no available slots for this date"}
+        render json: {"error": true, "msg": "no available slots for this date"}, status: 400
         return
       end
       calendar = calendar.day.find_by(:name => params[:day])
       if calendar.nil?
-        render json: {"error": true, "msg": "no available slots for this date"}
+        render json: {"error": true, "msg": "no available slots for this date"}, status: 400
         return
       end
       if is_available.nil?
@@ -79,9 +79,9 @@ end
       else
         slots = calendar.slot.where(:is_available => is_available)
       end
-      render json: {"error": false, "data": slots}
+      render json: {"error": false, "data": slots}, status: 200
     rescue Exception => e
-      render json: {"error": true, "msg": e.to_s}
+      render json: {"error": true, "msg": e.to_s}, status: 400
     end
   end
 
