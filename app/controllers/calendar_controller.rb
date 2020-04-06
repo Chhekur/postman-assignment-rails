@@ -114,9 +114,9 @@ end
         @calendar = @calendar.slot.find_by(:start_time => start_time, :end_time => end_time)
         @calendar[:start_time] = params[:start_time]
         @calendar[:end_time] = params[:end_time]
-        render json: {"error": false, "msg": "slot updated"}, status: 200
         begin
           @calendar.save!
+          render json: {"error": false, "msg": "slot updated"}, status: 200
         rescue Exception => e
           render json: {"error": true, "msg": e.to_s}, status: 400
         end

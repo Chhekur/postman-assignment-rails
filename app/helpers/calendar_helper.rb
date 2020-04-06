@@ -1,14 +1,14 @@
 module CalendarHelper
 
   def validate_params_for_create_slot? params
-    if validate_general_params? or validate_slot?
+    if validate_general_params? or validate_slot? params
       return false
     end
     return true
   end
 
   def validate_params_for_book_slot? params
-    if validate_general_params? or validate_slot? or validate_email?
+    if validate_general_params? or validate_slot? params or validate_email?
       return false
     end
     return true
@@ -22,19 +22,23 @@ module CalendarHelper
   end
 
   def validate_params_for_delete_slot? params
-    if validate_general_params? or validate_slot?
+    if validate_general_params? or validate_slot? params
       return false
     end
     return true
   end
 
   def validate_params_for_update_slot? params
-    if validate_general_params? or validate_slot?
-      params[:start_time] = params[:new_start_time]
-      params[:end_time] = params[:new_end_time]
-      if validate_slot?
-        return false
-      end
+    if validate_general_params? or validate_slot? params
+      return false
+    end
+    param = params
+    param = {
+      :start_time => params[:new_start_time],
+      :end_time => params[:new_end_time]
+    }
+
+    if validate_slot? param
       return false
     end
     return true
@@ -80,7 +84,7 @@ module CalendarHelper
     return false
   end
 
-  def validate_slot?
+  def validate_slot? params
     if params[:start_time].nil? or params[:end_time].nil?
       render json: {"error": true, "msg": "missing parameters"}, status: 400
       return true
