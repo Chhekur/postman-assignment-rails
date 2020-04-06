@@ -89,6 +89,45 @@ end
     end
   end
 
+  def delete_slot
+    return if !validate_params_for_delete_slot? params
+    if is_slot_exists?
+      begin
+        @calendar.delete
+        render json: {"error": false, "msg": "slot deleted"}, status: 200
+      rescue Exception => e
+        render json: {"error": true, "msg": e.to_s}, status: 400
+      end
+    else
+      render json: {"error": true, "msg": "slot doesn't exists"}, status: 400
+    end
+  end
+
+  def update_slot
+    return if !validate_params_for_update_slot? params
+    if is_slot_exists?
+      start_time = params[:start_time]
+      end_time = params[:end_time]
+      params[:start_time] = params[:new_start_time]
+      params[:end_time] = params[:new_end_time]
+      if !is_slot_exists?
+        @calendar = @calendar.slot.find_by(:start_time => start_time, :end_time => end_time)
+        @calendar[:start_time] = params[:start_time]
+        @calendar[:end_time] = params[:end_time]
+        render json: {"error": false, "msg": "slot updated"}, status: 200
+        begin
+          @calendar.save!
+        rescue Exception => e
+          render json: {"error": true, "msg": e.to_s}, status: 400
+        end
+      else
+        render json: {"error": false, "msg": "new slot already exists"}, status: 400
+      end
+    else
+      render json: {"error": true, "msg": "slot doesn't exists"}, status: 400
+    end
+  end
+
   def get_available_slots
     return if !validate_params_for_get_slot? params
     get_slots(true)
@@ -111,6 +150,7 @@ end
 
   def is_slot_exists?
     begin
+      @user = @current_user if @user.nil?
       @calendar = @user.calendar.year.find_by(:name => params[:year])
       if @calendar.nil?
         return false
@@ -123,10 +163,11 @@ end
       if @calendar.nil?
         return false
       end
-      @calendar = @calendar.slot.find_by(:start_time => params[:start_time], :end_time => params[:end_time])
-      if @calendar.nil?
+      temp = @calendar.slot.find_by(:start_time => params[:start_time], :end_time => params[:end_time])
+      if temp.nil?
         return false
       end
+      @calendar = temp
       return true
     rescue Exception => e
       return false

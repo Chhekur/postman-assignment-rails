@@ -21,6 +21,25 @@ module CalendarHelper
     return true
   end
 
+  def validate_params_for_delete_slot? params
+    if validate_general_params? or validate_slot?
+      return false
+    end
+    return true
+  end
+
+  def validate_params_for_update_slot? params
+    if validate_general_params? or validate_slot?
+      params[:start_time] = params[:new_start_time]
+      params[:end_time] = params[:new_end_time]
+      if validate_slot?
+        return false
+      end
+      return false
+    end
+    return true
+  end
+
   private
 
   def validate_general_params?

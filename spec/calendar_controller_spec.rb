@@ -361,5 +361,108 @@ RSpec.describe CalendarController, :type => :controller do
         expect(res["msg"]).to eq "no available slots for this date"
       end
     end
+
+    describe "Delete #delete_slot" do
+
+      before do
+        post :create_slot, :params => {
+          :year => "2020",
+          :month => "12",
+          :day => "15",
+          :start_time => "10",
+          :end_time => "11"
+        }
+      end
+
+      it "should return error = false msg = slot deleted with all parameterss" do
+        delete :delete_slot, :params => {
+          :year => "2020",
+          :month => "12",
+          :day => "15",
+          :start_time => "10",
+          :end_time => "11"
+        }
+
+        res = JSON.parse(response.body)
+        expect(response.status.to_s).to eq 200.to_s
+        expect(res["msg"]).to eq "slot deleted"
+      end
+
+      it "should return error = true msg = slot doesn't exists with invalid parameters" do
+        delete :delete_slot, :params => {
+          :year => "2020",
+          :month => "12",
+          :day => "15",
+          :start_time => "10",
+          :end_time => "12"
+        }
+
+        res = JSON.parse(response.body)
+        expect(response.status.to_s).to eq 400.to_s
+        expect(res["msg"]).to eq "slot doesn't exists"
+      end
+    end
+
+    describe "Update #update_slot" do
+
+      before do
+        post :create_slot, :params => {
+          :year => "2020",
+          :month => "12",
+          :day => "15",
+          :start_time => "10",
+          :end_time => "11"
+        }
+      end
+
+      it "should return error = false msg = slot updated with all parameterss" do
+        post :update_slot, :params => {
+          :year => "2020",
+          :month => "12",
+          :day => "15",
+          :start_time => "10",
+          :end_time => "11",
+          :new_start_time => "12",
+          :new_end_time => "13",
+        }
+
+        res = JSON.parse(response.body)
+        expect(response.status.to_s).to eq 200.to_s
+        expect(res["msg"]).to eq "slot updated"
+      end
+
+      it "should return error = true msg = slot doesn't exists with invalid parameters" do
+        post :update_slot, :params => {
+          :year => "2020",
+          :month => "12",
+          :day => "15",
+          :start_time => "1",
+          :end_time => "2",
+          :new_start_time => "11",
+          :new_end_time => "12",
+
+        }
+
+        res = JSON.parse(response.body)
+        expect(response.status.to_s).to eq 400.to_s
+        expect(res["msg"]).to eq "slot doesn't exists"
+      end
+
+      it "should return error = true msg = new slot doesn't exists with invalid parameters" do
+        post :update_slot, :params => {
+          :year => "2020",
+          :month => "12",
+          :day => "15",
+          :start_time => "10",
+          :end_time => "11",
+          :new_start_time => "10",
+          :new_end_time => "11",
+        }
+
+        res = JSON.parse(response.body)
+        expect(response.status.to_s).to eq 400.to_s
+        expect(res["msg"]).to eq "new slot already exists"
+      end
+    end
   end
 end

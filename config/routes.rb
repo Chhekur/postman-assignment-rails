@@ -8,4 +8,6 @@ Rails.application.routes.draw do
   get "/api/get-slots" => "calendar#get_slots"
   get "/api/get-available-slots" => "calendar#get_available_slots"
   get "/api/get-booked-slots" => "calendar#get_booked_slots"
+  delete "/api/delete-slot" => "calendar#delete_slot"
+  post "/api/update-slot" => "calendar#update_slot"
 end
