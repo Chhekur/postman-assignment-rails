@@ -24,11 +24,11 @@ class CalendarController < ApplicationController
         render json: {"error": true, "msg": "slot is alredy there"}
         return
       end
-      render json: {"error": true, "msg": "slot created"}
+      render json: {"error": false, "msg": "slot created"}
     rescue Exception => e
       render json: {"error": true, "msg": e.to_s}
     end
-  end
+end
 
   def book_slot
     begin
@@ -38,7 +38,7 @@ class CalendarController < ApplicationController
             @calendar.is_available = false
             @calendar.user = @user.id
             @calendar.save!
-            render json: {"error": true, "msg": "slot booked"}
+            render json: {"error": false, "msg": "slot booked"}
           else
             render json: {"error": true, "msg": "slot is already booked"}  
           end
@@ -79,7 +79,7 @@ class CalendarController < ApplicationController
       else
         slots = calendar.slot.where(:is_available => is_available)
       end
-      render json: {"error": true, "data": slots}
+      render json: {"error": false, "data": slots}
     rescue Exception => e
       render json: {"error": true, "msg": e.to_s}
     end
@@ -109,9 +109,7 @@ class CalendarController < ApplicationController
       if @calendar.nil?
         return false
       end
-      puts @calendar.month
       @calendar = @calendar.month.find_by(:name => params[:month])
-      puts 'calendar', @calendar
       if @calendar.nil?
         return false
       end
@@ -125,7 +123,6 @@ class CalendarController < ApplicationController
       end
       return true
     rescue Exception => e
-      puts e
       return false
     end
   end
